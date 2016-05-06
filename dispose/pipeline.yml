@@ -1,0 +1,25 @@
+resources:
+- name: laundrybasket
+  type: git
+  source:
+    uri: https://github.com/utako/laundrybasket
+
+- name: dirty-bosh-directors
+  type: pool
+  source:
+    uri: git@github.com:cloudfoundry/capi-ci-private
+    branch: locks
+    pool: dirty-bosh-directors
+    private_key: {{private_key}}
+
+jobs:
+- name: dispose
+  plan:
+  - aggregate:
+    - get: laundrybasket
+    - put: dirty-bosh-directors
+      params: {acquire: true}
+  - task: dispose
+    file: laundrybasket/dispose/scripts/dispose.yml
+  - put: dirty-bosh-directors
+    params: {remove: dirty-bosh-directors}
