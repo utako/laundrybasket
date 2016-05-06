@@ -14,12 +14,25 @@ resource_types:
   source:
     repository: businesscritical/laundry-pool
 
+- name: pool
+  type: docker-image
+  source:
+    repository: concourse/pool-resource
+
 resources:
 - name: isiticecreamyet-pr
   type: pull-request
   source:
     repo: businesscritical/isiticecreamyet
     access_token: {{access_token}}
+
+- name: bosh-directors
+  type: pool
+  source:
+    uri: git@github.com:cloudfoundry/capi-ci-private.git
+    branch: locks
+    pool: bosh-directors
+    private_key: {{private_key}}
 
 - name: bosh-envs
   type: laundry-pool
@@ -74,3 +87,15 @@ jobs:
       status: failure
   - put: bosh-envs
     params: {release: bosh-envs}
+
+- name: create-directors
+  plan:
+    - get: capi-ci
+    - task: make-director
+      file: capi-ci/ci/pools/scripts/make-director.yml
+      params:
+        AWS_ACCESS_KEY_ID: {{runtime_aws_key_id}}
+        AWS_SECRET_ACCESS_KEY: {{runtime_aws_access_key}}
+    - put: bosh-directors
+      params:
+        add: 'job_output'
