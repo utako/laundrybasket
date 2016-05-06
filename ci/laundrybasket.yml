@@ -1,0 +1,76 @@
+groups:
+- name: laundrybasket
+  jobs:
+  - test-isiticecreamyet-prs
+
+resource_types:
+- name: pull-request
+  type: docker-image
+  source:
+    repository: jtarchie/pr
+
+- name: laundry-pool
+  type: docker-image
+  source:
+    repository: businesscritical/laundry-pool
+
+resources:
+- name: isiticecreamyet-pr
+  type: pull-request
+  source:
+    repo: businesscritical/isiticecreamyet
+    access_token: {{access_token}}
+
+- name: bosh-envs
+  type: laundry-pool
+  source:
+    uri: git@github.com:cloudfoundry/capi-ci-private.git
+    branch: locks
+    pool: bosh-directors
+    private_key: {{private_key}}
+
+- name: capi-ci
+  type: git
+  source:
+    branch: laundrybasket
+    uri: https://github.com/cloudfoundry/capi-ci.git
+
+- name: capi-ci-private
+  type: git
+  source:
+    branch: laundry
+    private_key: {{private_key}}
+    uri: git@github.com:cloudfoundry/capi-ci-private.git
+
+- name: resource-version
+  type: semver
+  source:
+    driver: git
+    uri: git@github.com:utako/laundrybasket.git
+    branch: version
+    file: version
+    private_key: {{private_key}}
+
+jobs:
+- name: test-isiticecreamyet-prs
+  plan:
+  - aggregate:
+    - get: isiticecreamyet-pr
+      trigger: true
+    - get: capi-ci
+    - get: resource-version
+  - put: bosh-envs
+    params: {acquire: true}
+  - task: test_isiticecreamyet
+    file: capi-ci/ci/scripts/test_isiticecreamyet.yml
+    ensure:
+      put: resource-version
+      bump: patch
+    on_success:
+      put: isiticecreamyet-pr
+      status: success
+    on_failure:
+      put: isiticecreamyet-pr
+      status: failure
+  - put: bosh-envs
+    params: {release: bosh-envs}

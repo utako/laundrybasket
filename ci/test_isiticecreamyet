@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e -x
+
+cat "=== Testing IS IT ICE CREAM YET PR ==="
+
+cd isiticreamyet-pr
+
+version=$(cat ../resource-version/version)
+length=$((${#version}-1))
+lastDigit=${version:$i:1}
+isOdd=$(( lastDigit & 1 ))
+
+exit $isOdd
