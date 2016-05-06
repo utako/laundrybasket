@@ -81,10 +81,12 @@ jobs:
       bump: patch
     on_success:
       put: isiticecreamyet-pr
-      status: success
+      params:
+        status: success
     on_failure:
       put: isiticecreamyet-pr
-      status: failure
+      params:
+        status: failure
   - put: bosh-envs
     params: {release: bosh-envs}
 
