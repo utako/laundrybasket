@@ -1,0 +1,34 @@
+resource_types:
+- name: pool
+  type: docker-image
+  source:
+    repository: concourse/pool-resource
+
+resources:
+- name: bosh-directors
+  type: pool
+  source:
+    uri: git@github.com:cloudfoundry/capi-ci-private.git
+    branch: locks
+    pool: bosh-directors
+    private_key: {{private_key}}
+
+- name: capi-ci-laundry
+  type: git
+  source:
+    branch: laundrybasket
+    uri: https://github.com/cloudfoundry/capi-ci.git
+
+jobs:
+- name: create-directors
+  plan:
+    - get: capi-ci
+      resource: capi-ci-laundry
+    - task: make-director
+      file: capi-ci/ci/pools/scripts/make-director.yml
+      params:
+        AWS_ACCESS_KEY_ID: {{runtime_aws_key_id}}
+        AWS_SECRET_ACCESS_KEY: {{runtime_aws_access_key}}
+    - put: bosh-directors
+      params:
+        add: 'job_output'

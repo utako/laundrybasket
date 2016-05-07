@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -ex
+
 source ${HOME}/.bashrc
 
 echo "Installing bosh bootloader"

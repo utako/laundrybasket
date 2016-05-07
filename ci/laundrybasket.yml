@@ -26,14 +26,6 @@ resources:
     repo: businesscritical/isiticecreamyet
     access_token: {{access_token}}
 
-- name: bosh-directors
-  type: pool
-  source:
-    uri: git@github.com:cloudfoundry/capi-ci-private.git
-    branch: locks
-    pool: bosh-directors
-    private_key: {{private_key}}
-
 - name: bosh-envs
   type: laundry-pool
   source:
@@ -99,6 +91,8 @@ jobs:
       params:
         path: isiticecreamyet-pr
         status: failure
+  - put: bosh-envs
+    params: {release: bosh-envs}
 
 - name: create-directors
   plan:
