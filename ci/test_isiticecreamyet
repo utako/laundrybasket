@@ -5,7 +5,7 @@ echo "=== Testing IS IT ICE CREAM YET PR ==="
 
 version=$(cat resource-version/version)
 length=$((${#version}-1))
-lastDigit=${version:$i:1}
+lastDigit=${version:$length:1}
 isOdd=$(( lastDigit & 1 ))
 
 
