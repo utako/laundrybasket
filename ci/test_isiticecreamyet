@@ -10,4 +10,8 @@ length=$((${#version}-1))
 lastDigit=${version:$i:1}
 isOdd=$(( lastDigit & 1 ))
 
+
+echo "lastDigit: $lastDigit"
+echo "EXIT STATUS: $isOdd"
+
 exit $isOdd

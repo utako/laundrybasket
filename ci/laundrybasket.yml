@@ -92,6 +92,7 @@ jobs:
     on_success:
       put: isiticecreamyet-pr
       params:
+        path: isiticecreamyet-pr
         status: success
     on_failure:
       put: isiticecreamyet-pr
