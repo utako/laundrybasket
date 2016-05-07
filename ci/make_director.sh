@@ -18,7 +18,7 @@ bbl --aws-access-key-id="${AWS_ACCESS_KEY_ID}" \
 
 DIRECTOR_IP=$(grep "Director Address" ./tmp/bbl_output  | awk 'BEGIN { FS = ":" } ; { print $2 }')
 
-DIRECTOR_UUID=$(curl -k "https://${DIRECTOR_IP}:25555/info" | sed -n 's/.*"uuid":"\([^"]*\)".*/\1/p')
+DIRECTOR_UUID=$(curl -k "https://${DIRECTOR_IP}:25555/info" | sed -n 's/.*"uuid":"\([^"]*\)".*/\1/p' | sed -e 's/ //g')
 
 echo ${DIRECTOR_UUID} > "job_output/name"
 echo '---' > "job_output/metadata"
