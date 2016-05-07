@@ -42,11 +42,11 @@ resources:
     pool: bosh-directors
     private_key: {{private_key}}
 
-- name: capi-ci
+- name: laundrybasket
   type: git
   source:
-    branch: laundrybasket
-    uri: https://github.com/cloudfoundry/capi-ci.git
+    branch: master
+    uri: https://github.com/utako/laundrybasket.git
 
 - name: capi-ci-private
   type: git
@@ -65,20 +65,30 @@ resources:
     private_key: {{private_key}}
 
 jobs:
+- name: clean-dirty-bosh-directors
+  plan:
+
 - name: test-isiticecreamyet-prs
   plan:
   - aggregate:
     - get: isiticecreamyet-pr
       trigger: true
-    - get: capi-ci
+    - get: laundrybasket
     - get: resource-version
+  - put: isiticecreamyet-pr
+    params:
+      path: isiticecreamyet-pr
+      status: pending
   - put: bosh-envs
     params: {acquire: true}
-  - task: test_isiticecreamyet
-    file: capi-ci/ci/scripts/test_isiticecreamyet.yml
-    ensure:
-      put: resource-version
+  - put: resource-version
+    params:
       bump: patch
+  - task: test_isiticecreamyet
+    file: laundrybasket/ci/test_isiticecreamyet.yml
+    ensure:
+      put: bosh-envs
+      params: {release: bosh-envs}
     on_success:
       put: isiticecreamyet-pr
       params:
@@ -86,15 +96,14 @@ jobs:
     on_failure:
       put: isiticecreamyet-pr
       params:
+        path: isiticecreamyet-pr
         status: failure
-  - put: bosh-envs
-    params: {release: bosh-envs}
 
 - name: create-directors
   plan:
-    - get: capi-ci
+    - get: laundrybasket
     - task: make-director
-      file: capi-ci/ci/pools/scripts/make-director.yml
+      file: laundrybasket/ci/make-director.yml
       params:
         AWS_ACCESS_KEY_ID: {{runtime_aws_key_id}}
         AWS_SECRET_ACCESS_KEY: {{runtime_aws_access_key}}

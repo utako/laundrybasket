@@ -11,4 +11,4 @@ inputs:
   - name: resource-version
 
 run:
-  path: capi-ci/ci/scripts/test_isiticecreamyet
+  path: laundrybasket/ci/test_isiticecreamyet
