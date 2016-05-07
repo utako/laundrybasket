@@ -7,7 +7,7 @@ image_resource:
 
 inputs:
   - name: isiticecreamyet-pr
-  - name: capi-ci
+  - name: laundrybasket
   - name: resource-version
 
 run:
